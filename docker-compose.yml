@@ -1,0 +1,97 @@
+version: '3.5'
+services:    
+  phpldapadmin:
+    image: osixia/phpldapadmin:latest
+    container_name: phpldapadmin
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: ${LDAP_SERVER}
+    ports:
+#      - "1080:80"
+      - "1443:443"
+    networks:
+#      - ldapStagingNetwork
+      - ldapNetwork
+  gerrit_postgres:
+    image: postgres
+    container_name: gerrit_postgres
+#    ports:
+#      - "5432:5432"
+    environment:
+      POSTGRES_DB: "reviewdb"
+      POSTGRES_USER: "gerrit"
+      POSTGRES_PASSWORD: "gerrit"
+    volumes:
+      - gerrit_postgresql_data:/var/lib/postgresql/data
+  gerrit:
+    image: openfrontier/gerrit
+    container_name: gerrit
+    ports:
+      - "2443:2443"
+      - "11111:11111"
+    volumes:
+      - gerrit_review_site:/var/gerrit/review_site
+    environment:
+      HTTPD_LISTENURL: "https://*:2443"
+      SSHD_LISTENADDRESS: "*:11111"
+      WEBURL: "https://gerrit.cashya.com"
+      DATABASE_TYPE: "postgresql"
+      DATABASE_HOSTNAME: "gerrit_postgres"
+      DATABASE_PORT: "5432"
+      DATABASE_DATABASE: "reviewdb"
+      DATABASE_USERNAME: "gerrit"
+      DATABASE_PASSWORD: "gerrit"
+      AUTH_TYPE: "LDAP"
+      LDAP_SERVER: "ldap://${LDAP_SERVER}"
+      LDAP_USERNAME: ${LDAP_ADMIN_DN}
+      LDAP_PASSWORD: ${LDAP_ADMIN_PASSWORD}
+      LDAP_ACCOUNTBASE: "ou=people,dc=cashya,dc=com"
+#      LDAP_ACCOUNTPATTERN: "(&(cn=$${username})(|(memberof=cn=Administrators,ou=gerrit,ou=group,dc=cashya,dc=com)(memberOf=cn=Registered Users,ou=gerrit,ou=group,dc=cashya,dc=com)))"
+      LDAP_ACCOUNTPATTERN: "(cn=$${username})"
+      LDAP_ACCOUNTFULLNAME: "displayName"
+      LDAP_ACCOUNTSSHUSERNAME: "cn"
+      LDAP_ACCOUNTEMAILADDRESS: "mail"
+      LDAP_GROUPBASE: "ou=gerrit,ou=group,dc=cashya,dc=com"
+      LDAP_GROUPPATTERN: "(cn=$${groupname})"
+      SMTP_SERVER: ${SMTP_SERVER}
+      SMTP_SERVER_PORT: ${SMTP_SERVER_PORT}
+      SMTP_ENCRYPTION: ${SMTP_ENCRYPTION}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_CONNECT_TIMEOUT: "10sec"
+      SMTP_FROM: "USER"
+    depends_on:
+      - gerrit_postgres
+    networks:
+      - default
+      - ldapNetwork
+#      - ldapProductNetwork
+  jenkins:
+    container_name: jenkins
+    # https://github.com/openfrontier/docker-jenkins
+    image: jenkins/jenkins:lts
+    volumes:
+#      - /home/ops/.ssh:/root/.ssh
+      - jenkins_home:/var/jenkins_home
+    user: root
+    environment:
+      JENKINS_OPTS: "--httpPort=-1 --httpsPort=8443"
+      LDAP_SERVER: "ldap://${LDAP_SERVER}"
+      LDAP_INHIBIT_INFER_ROOTDN: "true"
+      LDAP_USER_SEARCH_BASE: "ou=people,dc=cashya,dc=com"
+      LDAP_USER_SEARCH: "cn={0}"
+      LDAP_MANAGER_DN: ${LDAP_ADMIN_DN}
+      LDAP_MANAGER_PASSWORD: ${LDAP_ADMIN_PASSWORD}
+    ports:
+      - 3443:8443
+    networks:
+#      - ldapStagingNetwork
+      - ldapNetwork
+volumes:
+  gerrit_review_site:
+  gerrit_postgresql_data:
+  jenkins_home:
+networks:
+  ldapNetwork:
+    external: true
+#  ldapProductNetwork:
+#    external: true
