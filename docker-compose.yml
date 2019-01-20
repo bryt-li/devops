@@ -68,7 +68,7 @@ services:
   jenkins:
     container_name: jenkins
     # https://github.com/openfrontier/docker-jenkins
-    image: jenkins/jenkins:lts
+    image: openfrontier/jenkins
     volumes:
 #      - /home/ops/.ssh:/root/.ssh
       - jenkins_home:/var/jenkins_home
