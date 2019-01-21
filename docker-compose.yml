@@ -27,7 +27,7 @@ services:
     container_name: gerrit
     ports:
       - "2443:2443"
-      - "11111:11111"
+      - "29418:29418"
     volumes:
       - gerrit_review_site:/var/gerrit/review_site
     environment:
@@ -67,6 +67,7 @@ services:
 #      - ldapProductNetwork
   jenkins:
     container_name: jenkins
+    # https://github.com/openfrontier/docker-jenkins
     image: jenkins/jenkins:lts
     volumes:
 #      - /home/ops/.ssh:/root/.ssh
