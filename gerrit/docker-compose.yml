@@ -1,16 +1,5 @@
 version: '3.5'
 services:    
-  phpldapadmin:
-    image: osixia/phpldapadmin:latest
-    container_name: phpldapadmin
-    environment:
-      PHPLDAPADMIN_LDAP_HOSTS: ${LDAP_SERVER}
-    ports:
-#      - "1080:80"
-      - "1443:443"
-    networks:
-#      - ldapStagingNetwork
-      - ldapNetwork
   gerrit_postgres:
     image: postgres
     container_name: gerrit_postgres
@@ -64,28 +53,9 @@ services:
     networks:
       - default
       - ldapNetwork
-#      - ldapProductNetwork
-  jenkins:
-    container_name: jenkins
-    # https://github.com/openfrontier/docker-jenkins
-    image: jenkins/jenkins:lts
-    volumes:
-#      - /home/ops/.ssh:/root/.ssh
-      - jenkins_home:/var/jenkins_home
-    user: root
-    environment:
-      JENKINS_OPTS: "--httpPort=-1 --httpsPort=8443"
-    ports:
-      - 3443:8443
-    networks:
-#      - ldapStagingNetwork
-      - ldapNetwork
 volumes:
   gerrit_review_site:
   gerrit_postgresql_data:
-  jenkins_home:
 networks:
   ldapNetwork:
     external: true
-#  ldapProductNetwork:
-#    external: true
