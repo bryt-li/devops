@@ -1,0 +1,104 @@
+version: '3.5'
+services:
+  openldap:
+    image: 127.0.0.1:5000/openldap:1.0.0
+    container_name: openldap
+    environment:
+      LDAP_ORGANISATION: "Redin Co"
+      LDAP_DOMAIN: "redin.co"
+      LDAP_BASE_DN: "dc=redin,dc=co"
+      LDAP_ADMIN_PASSWORD: ${LDAP_ADMIN_PASSWORD}
+      LDAP_CONFIG_PASSWORD: ${LDAP_CONFIG_PASSWORD}
+      LDAP_REMOVE_CONFIG_AFTER_SETUP: "false"
+    volumes:
+      - /data/openldap/data:/var/lib/ldap
+      - /data/openldap/config:/etc/ldap/slapd.d
+    ports:
+      - "389:389"
+      - "636:636"
+  pwm:
+    image: 127.0.0.1:5000/pwm/pwm-webapp
+    container_name: pwm
+    ports:
+#      - "2080:8080"
+      - "3443:8443"
+    volumes:
+      - /data/pwm/PwmConfiguration.xml:/config/PwmConfiguration.xml
+    depends_on:
+      - openldap      
+
+  phpldapadmin:
+    image: osixia/phpldapadmin:latest
+    container_name: phpldapadmin
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: ${LDAP_SERVER}
+    ports:
+#      - "1080:80"
+      - "1443:443"
+    depends_on:
+      - openldap      
+
+  jenkins:
+    container_name: jenkins
+    # https://github.com/openfrontier/docker-jenkins
+    image: jenkins/jenkins:lts
+    volumes:
+      - /data/jenkins_home:/var/jenkins_home
+    user: root
+    environment:
+      JENKINS_OPTS: "--httpPort=-1 --httpsPort=8443"
+    ports:
+      - 3443:8443
+    depends_on:
+      - openldap
+
+  gerrit_postgres:
+    image: postgres
+    container_name: gerrit_postgres
+#    ports:
+#      - "5432:5432"
+    environment:
+      POSTGRES_DB: "reviewdb"
+      POSTGRES_USER: "gerrit"
+      POSTGRES_PASSWORD: "gerrit"
+    volumes:
+      - /data/gerrit_postgresql_data:/var/lib/postgresql/data
+  gerrit:
+    image: openfrontier/gerrit
+    container_name: gerrit
+    ports:
+      - "2443:2443"
+      - "29418:29418"
+    volumes:
+      - /data/gerrit_review_site:/var/gerrit/review_site
+    environment:
+      HTTPD_LISTENURL: "https://*:2443"
+      SSHD_LISTENADDRESS: "*:11111"
+      WEBURL: "https://gerrit.redin.co"
+      DATABASE_TYPE: "postgresql"
+      DATABASE_HOSTNAME: "gerrit_postgres"
+      DATABASE_PORT: "5432"
+      DATABASE_DATABASE: "reviewdb"
+      DATABASE_USERNAME: "gerrit"
+      DATABASE_PASSWORD: "gerrit"
+      AUTH_TYPE: "LDAP"
+      LDAP_SERVER: "ldap://${LDAP_SERVER}"
+      LDAP_USERNAME: ${LDAP_ADMIN_DN}
+      LDAP_PASSWORD: ${LDAP_ADMIN_PASSWORD}
+      LDAP_ACCOUNTBASE: "ou=people,dc=redin,dc=co"
+      LDAP_ACCOUNTPATTERN: "(&(cn=$${username})(memberof=cn=gerritUser,ou=group,dc=redin,dc=co))"
+      LDAP_ACCOUNTFULLNAME: "displayName"
+      LDAP_ACCOUNTSSHUSERNAME: "cn"
+      LDAP_ACCOUNTEMAILADDRESS: "mail"
+      LDAP_GROUPBASE: "ou=gerrit,ou=group,dc=redin,dc=co"
+      LDAP_GROUPPATTERN: "(cn=$${groupname})"
+      SMTP_SERVER: ${SMTP_SERVER}
+      SMTP_SERVER_PORT: ${SMTP_SERVER_PORT}
+      SMTP_ENCRYPTION: ${SMTP_ENCRYPTION}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_CONNECT_TIMEOUT: "10sec"
+      SMTP_FROM: "USER"
+    depends_on:
+      - gerrit_postgres
+      - openldap

@@ -1,0 +1,35 @@
+dn: ou=people,{{ LDAP_BASE_DN }}
+changetype: add
+objectClass: organizationalUnit
+ou: people
+
+dn: cn=bryt,ou=people,{{ LDAP_BASE_DN }}
+changetype: add
+objectclass: inetOrgPerson
+objectclass: pwmUser
+cn: bryt
+sn: li
+userpassword: admin
+
+dn: ou=group,{{ LDAP_BASE_DN }}
+changetype: add
+objectClass: organizationalUnit
+ou: group
+
+dn: cn=pwmAdmin,ou=group,{{ LDAP_BASE_DN }}
+changetype: add
+objectClass: groupOfUniqueNames
+cn: pwmAdmin
+uniqueMember: cn=bryt,ou=people,{{ LDAP_BASE_DN }}
+
+dn: cn=gerritUser,ou=group,{{ LDAP_BASE_DN }}
+changetype: add
+objectClass: groupOfUniqueNames
+cn: gerritUser
+uniqueMember: cn=bryt,ou=people,{{ LDAP_BASE_DN }}
+
+dn: ou=jenkinsUser,ou=group,{{ LDAP_BASE_DN }}
+changetype: add
+objectClass: groupOfUniqueNames
+ou: jenkinsUser
+uniqueMember: cn=bryt,ou=people,{{ LDAP_BASE_DN }}

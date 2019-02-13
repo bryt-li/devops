@@ -1,4 +1,4 @@
-# openldap Directory Service
+# PWM: Password Self-Service Application
 
 ## Build Docker Image & Push to ECR
 ```

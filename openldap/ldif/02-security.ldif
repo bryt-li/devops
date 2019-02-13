@@ -1,0 +1,27 @@
+dn: olcDatabase={1}{{ LDAP_BACKEND }},cn=config
+changetype: modify
+delete: olcAccess
+-
+add: olcAccess
+olcAccess: to attrs=userPassword,shadowLastChange
+    by self write
+    by dn="cn=admin,{{ LDAP_BASE_DN }}" write
+    by anonymous auth
+    by * none
+olcAccess: to *
+    by self write
+    by dn="cn=admin,{{ LDAP_BASE_DN }}" write
+    by * none
+#olcAccess: to dn.base="" by * write
+#olcAccess: to dn.subtree="ou=people,{{ LDAP_BASE_DN }}"
+#        by dn="cn=admin,{{ LDAP_BASE_DN }}" write
+#        by dn="cn=pwmadmin,{{ LDAP_BASE_DN }}" write
+#        by anonymous auth
+#        by self write
+#        by * none
+#olcAccess: to attrs=userPassword,shadowLastChange
+#        by dn="cn=admin,{{ LDAP_BASE_DN }}" write
+#        by dn="cn=pwmadmin,{{ LDAP_BASE_DN }}" write
+#        by anonymous auth
+#        by self write
+#        by * none

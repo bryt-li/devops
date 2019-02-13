@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: openldap
+  labels:
+    app: openldap
+    tier: frontend
+spec:
+  type: LoadBalancer
+  ports:
+    - name: https
+      port: 433
+      targetPort: openldap-https
+    - name: http
+      port: 80
+      targetPort: openldap-http        
+  selector:
+    app: openldap
+    tier: frontend
