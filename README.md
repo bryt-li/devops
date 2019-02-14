@@ -10,6 +10,9 @@ make
 
 cd pwm
 make
+
+cd openresty
+make
 ```
 
 # Setup Environments for credentials

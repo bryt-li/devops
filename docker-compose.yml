@@ -1,5 +1,5 @@
 version: '3.5'
-services:
+services:    
   openldap:
     image: 127.0.0.1:5000/openldap:1.0.0
     container_name: openldap
@@ -21,20 +21,20 @@ services:
     container_name: pwm
     ports:
 #      - "2080:8080"
-      - "3443:8443"
+#      - "3443:8443"
     volumes:
       - /data/pwm/PwmConfiguration.xml:/config/PwmConfiguration.xml
     depends_on:
-      - openldap      
+      - openldap
 
   phpldapadmin:
     image: osixia/phpldapadmin:latest
     container_name: phpldapadmin
     environment:
-      PHPLDAPADMIN_LDAP_HOSTS: ${LDAP_SERVER}
-    ports:
+      PHPLDAPADMIN_LDAP_HOSTS: openldap
+#    ports:
 #      - "1080:80"
-      - "1443:443"
+#      - "1443:443"
     depends_on:
       - openldap      
 
@@ -46,9 +46,10 @@ services:
       - /data/jenkins_home:/var/jenkins_home
     user: root
     environment:
-      JENKINS_OPTS: "--httpPort=-1 --httpsPort=8443"
-    ports:
-      - 3443:8443
+      JENKINS_OPTS: "--httpPort=80 --httpsPort=-1"
+#    ports:
+#      - 8080:80
+#      - 3443:8443
     depends_on:
       - openldap
 
@@ -67,13 +68,12 @@ services:
     image: openfrontier/gerrit
     container_name: gerrit
     ports:
-      - "2443:2443"
+#      - "80:80"
       - "29418:29418"
     volumes:
       - /data/gerrit_review_site:/var/gerrit/review_site
     environment:
-      HTTPD_LISTENURL: "https://*:2443"
-      SSHD_LISTENADDRESS: "*:11111"
+      HTTPD_LISTENURL: "http://*:80"
       WEBURL: "https://gerrit.redin.co"
       DATABASE_TYPE: "postgresql"
       DATABASE_HOSTNAME: "gerrit_postgres"
@@ -82,7 +82,7 @@ services:
       DATABASE_USERNAME: "gerrit"
       DATABASE_PASSWORD: "gerrit"
       AUTH_TYPE: "LDAP"
-      LDAP_SERVER: "ldap://${LDAP_SERVER}"
+      LDAP_SERVER: "ldap://openldap"
       LDAP_USERNAME: ${LDAP_ADMIN_DN}
       LDAP_PASSWORD: ${LDAP_ADMIN_PASSWORD}
       LDAP_ACCOUNTBASE: "ou=people,dc=redin,dc=co"
@@ -102,3 +102,11 @@ services:
     depends_on:
       - gerrit_postgres
       - openldap
+
+  openresty:
+    image: 127.0.0.1:5000/openresty-letsencrypt
+    depends_on:
+      - gerrit
+      - phpldapadmin
+      - pwm
+      - jenkins

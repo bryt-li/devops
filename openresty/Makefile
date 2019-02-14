@@ -1,4 +1,4 @@
-NAME = openldap
+NAME = openresty-letsencrypt
 VERSION = 1.0.0
 REPO = 127.0.0.1:5000/$(NAME)
 
