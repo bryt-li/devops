@@ -16,6 +16,7 @@ services:
     ports:
       - "389:389"
       - "636:636"
+    restart: "always"
   pwm:
     image: 127.0.0.1:5000/pwm/pwm-webapp
     container_name: pwm
@@ -24,6 +25,7 @@ services:
 #      - "3443:8443"
     volumes:
       - /data/pwm_config:/config
+    restart: "always"
     depends_on:
       - openldap
 
@@ -35,6 +37,7 @@ services:
 #    ports:
 #      - "1080:80"
 #      - "1443:443"
+    restart: "always"
     depends_on:
       - openldap      
 
@@ -50,6 +53,7 @@ services:
 #    ports:
 #      - 8080:80
 #      - 3443:8443
+    restart: "always"
     depends_on:
       - openldap
 
@@ -64,6 +68,7 @@ services:
       POSTGRES_PASSWORD: "gerrit"
     volumes:
       - /data/gerrit_postgresql_data:/var/lib/postgresql/data
+    restart: "always"
   gerrit:
     image: openfrontier/gerrit
     container_name: gerrit
@@ -99,12 +104,14 @@ services:
       SMTP_PASS: ${SMTP_PASS}
       SMTP_CONNECT_TIMEOUT: "10sec"
       SMTP_FROM: "USER"
+    restart: "always"
     depends_on:
       - gerrit_postgres
       - openldap
 
   openresty:
-    image: 127.0.0.1:5000/openresty-letsencrypt
+    image: 127.0.0.1:5000/openresty-letsencrypt:1.0.0
+    restart: "always"
     depends_on:
       - gerrit
       - phpldapadmin
