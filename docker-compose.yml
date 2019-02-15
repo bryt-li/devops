@@ -78,7 +78,7 @@ services:
     volumes:
       - /data/gerrit_review_site:/var/gerrit/review_site
     environment:
-      HTTPD_LISTENURL: "http://*:80"
+      HTTPD_LISTENURL: "http://*:8080"
       WEBURL: "https://gerrit.redin.co"
       DATABASE_TYPE: "postgresql"
       DATABASE_HOSTNAME: "gerrit_postgres"
@@ -115,6 +115,8 @@ services:
 
   openresty:
     image: 127.0.0.1:5000/openresty-letsencrypt:1.0.0
+    volumes:
+      - /data/nginx_logs:/usr/local/openresty/nginx/logs
     restart: "always"
     ports:
       - "80:80"
