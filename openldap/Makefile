@@ -2,7 +2,7 @@ NAME = openldap
 VERSION = 1.0.0
 REPO = 127.0.0.1:5000/$(NAME)
 
-.PHONY: all
+.PHONY: all pub tag build build-nocache
 
 all: pub
 

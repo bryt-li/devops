@@ -23,7 +23,7 @@ services:
 #      - "2080:8080"
 #      - "3443:8443"
     volumes:
-      - /data/pwm/PwmConfiguration.xml:/config/PwmConfiguration.xml
+      - /data/pwm_config:/config
     depends_on:
       - openldap
 
