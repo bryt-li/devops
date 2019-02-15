@@ -19,7 +19,7 @@ services:
   pwm:
     image: 127.0.0.1:5000/pwm/pwm-webapp
     container_name: pwm
-    ports:
+#    ports:
 #      - "2080:8080"
 #      - "3443:8443"
     volumes:

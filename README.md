@@ -18,10 +18,9 @@ make
 # Setup Environments for credentials
 
 ```
-export LDAP_SERVER="openldap"
 export LDAP_ADMIN_DN="cn=admin,dc=redin,dc=co"
-export LDAP_ADMIN_PASSWORD=""
-export LDAP_CONFIG_PASSWORD=""
+export LDAP_ADMIN_PASSWORD="admin"
+export LDAP_CONFIG_PASSWORD="config"
 
 export SMTP_SERVER=
 export SMTP_SERVER_PORT=
