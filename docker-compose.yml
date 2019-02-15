@@ -109,6 +109,10 @@ services:
       - gerrit_postgres
       - openldap
 
+  redin:
+    image: nginx
+    restart: "always"
+
   openresty:
     image: 127.0.0.1:5000/openresty-letsencrypt:1.0.0
     restart: "always"
@@ -117,3 +121,4 @@ services:
       - phpldapadmin
       - pwm
       - jenkins
+      - redin
