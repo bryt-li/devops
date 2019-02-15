@@ -78,7 +78,7 @@ services:
     volumes:
       - /data/gerrit_review_site:/var/gerrit/review_site
     environment:
-      HTTPD_LISTENURL: "http://*:8080"
+      HTTPD_LISTENURL: "https://*:8443"
       WEBURL: "https://gerrit.redin.co"
       DATABASE_TYPE: "postgresql"
       DATABASE_HOSTNAME: "gerrit_postgres"
@@ -95,8 +95,6 @@ services:
       LDAP_ACCOUNTFULLNAME: "displayName"
       LDAP_ACCOUNTSSHUSERNAME: "cn"
       LDAP_ACCOUNTEMAILADDRESS: "mail"
-      LDAP_GROUPBASE: "ou=gerrit,ou=group,dc=redin,dc=co"
-      LDAP_GROUPPATTERN: "(cn=$${groupname})"
       SMTP_SERVER: ${SMTP_SERVER}
       SMTP_SERVER_PORT: ${SMTP_SERVER_PORT}
       SMTP_ENCRYPTION: ${SMTP_ENCRYPTION}
