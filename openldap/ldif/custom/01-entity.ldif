@@ -28,8 +28,8 @@ objectClass: groupOfUniqueNames
 cn: gerritUser
 uniqueMember: cn=bryt,ou=people,{{ LDAP_BASE_DN }}
 
-dn: ou=jenkinsUser,ou=group,{{ LDAP_BASE_DN }}
+dn: cn=jenkinsUser,ou=group,{{ LDAP_BASE_DN }}
 changetype: add
 objectClass: groupOfUniqueNames
-ou: jenkinsUser
+cn: jenkinsUser
 uniqueMember: cn=bryt,ou=people,{{ LDAP_BASE_DN }}
